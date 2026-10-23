@@ -289,8 +289,8 @@ vmprint_walk(pagetable_t pagetable, uint64 base, int level)
 
     uint64 va = base | ((uint64)i << (12 + 9 * level));
     for (int depth = 2; depth >= level; depth--)
-      printk(depth == 2 ? ".." : " ..");
-    printk("%p: pte %p pa %p\n", va, pte, PTE2PA(pte));
+      printk(" ..");
+    printk("%p: pte %p pa %p\n", (void *)va, (void *)pte, (void *)PTE2PA(pte));
 
     if (level > 0 && (pte & (PTE_R | PTE_W | PTE_X)) == 0)
       vmprint_walk((pagetable_t)PTE2PA(pte), va, level - 1);
