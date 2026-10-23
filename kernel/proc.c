@@ -211,6 +211,7 @@ proc_pagetable(struct proc *p)
     return 0;
   }
 
+  // map the shared page below the trapframe; user can read it, not write it.
   if (mappages(pagetable, USYSCALL, PGSIZE, (uint64)p->usyscall,
                PTE_R | PTE_U) < 0) {
     uvmunmap(pagetable, TRAMPOLINE, 1, 0);

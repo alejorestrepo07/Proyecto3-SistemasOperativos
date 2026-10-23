@@ -66,6 +66,6 @@
 
 #ifndef __ASSEMBLER__
 struct usyscall {
-	int pid;
+  int pid;
 };
 #endif
