@@ -72,6 +72,36 @@ sys_vmprint(void)
 }
 
 uint64
+sys_pgaccess(void)
+{
+  uint64 base, dst, mask = 0;
+  int npages;
+  struct proc *p = myproc();
+
+  argaddr(0, &base);
+  argint(1, &npages);
+  argaddr(2, &dst);
+
+  if (base % PGSIZE != 0 || npages < 1 || npages > 64)
+    return -1;
+  if (base > p->sz || (uint64)npages * PGSIZE > p->sz - base)
+    return -1;
+
+  for (int i = 0; i < npages; i++) {
+    // walk() with alloc=0 so lazy pages are not allocated.
+    pte_t *pte = walk(p->pagetable, base + (uint64)i * PGSIZE, 0);
+    if (pte && (*pte & PTE_V) && (*pte & PTE_A)) {
+      mask |= 1UL << i;
+      *pte &= ~PTE_A;
+    }
+  }
+
+  if (copyout(p->pagetable, p->sz, dst, (char *)&mask, sizeof(mask)) < 0)
+    return -1;
+  return 0;
+}
+
+uint64
 sys_pause(void)
 {
   int n;
